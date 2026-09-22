@@ -120,6 +120,12 @@ const routes = [
         component: () => import('../views/AcademyView.vue'),
         meta: { title: 'Academy' },
       },
+      {
+        path: 'admin-access',
+        name: 'admin-access',
+        component: () => import('../views/AdminAccessView.vue'),
+        meta: { title: 'Admin Access' },
+      },
     ],
   },
 ]

@@ -11,6 +11,7 @@ import {
   Receipt,
   ScrollText,
   ShieldAlert,
+  ShieldCheck,
   Users,
   Webhook,
 } from 'lucide-vue-next'
@@ -35,6 +36,7 @@ const links = [
   { to: { name: 'academy' }, icon: BookOpen, label: 'Academy' },
   { to: { name: 'webhooks' }, icon: Webhook, label: 'Webhooks' },
   { to: { name: 'audit-log' }, icon: ScrollText, label: 'Audit Log' },
+  { to: { name: 'admin-access' }, icon: ShieldCheck, label: 'Admin Access' },
 ]
 
 const handleLogout = async () => {

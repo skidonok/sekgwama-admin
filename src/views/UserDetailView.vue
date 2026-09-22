@@ -1,17 +1,21 @@
 <script setup>
-import { ArrowLeft, ExternalLink, Receipt } from 'lucide-vue-next'
+import { ArrowLeft, ExternalLink, Receipt, ShieldCheck, ShieldOff } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 
 import StatusBadge from '../components/StatusBadge.vue'
 import { getErrorMessage } from '../services/api'
+import { grantAdminAccess, listAdmins, revokeAdminAccess } from '../services/adminAccess'
 import { listBankAccounts } from '../services/bankAccountsAdmin'
 import { listGoals } from '../services/goalsAdmin'
 import { getOnboardingDraft, getDocumentUrl } from '../services/onboardingAdmin'
 import { getReferralSummary } from '../services/referralsAdmin'
 import { getOrderHistory, getPositions } from '../services/tradingAdmin'
 import { getUser } from '../services/users'
+import { useAuthStore } from '../stores/auth'
 import { onboardingStatusLabel, onboardingStatusVariant, orderStatusLabel, orderStatusVariant } from '../utils/badges'
 import { formatAmount, formatDate, formatDateTime } from '../utils/format'
+
+const auth = useAuthStore()
 
 const props = defineProps({
   uid: { type: String, required: true },
@@ -31,9 +35,52 @@ const goals = makeSection()
 const referrals = makeSection()
 const positions = makeSection()
 const orders = makeSection()
+const adminAccess = makeSection()
 
 const documentUrlLoading = ref(null) // documentType currently being fetched, or null
 const documentUrlError = ref('')
+
+const adminActionLoading = ref(false)
+const adminActionError = ref('')
+
+// listAdmins() returns every admin, not just this uid - the admin panel has
+// no single-uid lookup endpoint since the underlying list is small (env
+// allowlist + a handful of Firestore grants), so filtering client-side here
+// avoids adding one just for this.
+const loadAdminAccess = async () => {
+  await loadSection(adminAccess, async () => {
+    const admins = await listAdmins()
+    return admins.find((admin) => admin.uid === props.uid) || null
+  })
+}
+
+const grantAccess = async () => {
+  if (adminActionLoading.value) return
+  adminActionLoading.value = true
+  adminActionError.value = ''
+  try {
+    await grantAdminAccess(props.uid)
+    await loadAdminAccess()
+  } catch (err) {
+    adminActionError.value = getErrorMessage(err)
+  } finally {
+    adminActionLoading.value = false
+  }
+}
+
+const revokeAccess = async () => {
+  if (adminActionLoading.value) return
+  adminActionLoading.value = true
+  adminActionError.value = ''
+  try {
+    await revokeAdminAccess(props.uid)
+    await loadAdminAccess()
+  } catch (err) {
+    adminActionError.value = getErrorMessage(err)
+  } finally {
+    adminActionLoading.value = false
+  }
+}
 
 const loadSection = async (section, fetcher) => {
   section.value = { loading: true, error: '', data: null }
@@ -90,6 +137,7 @@ const load = async () => {
   loadSection(referrals, () => getReferralSummary(props.uid))
   loadSection(positions, () => getPositions(props.uid))
   loadSection(orders, () => getOrderHistory(props.uid, { limit: 20 }))
+  loadAdminAccess()
 }
 
 const displayName = (user) => [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email
@@ -138,13 +186,45 @@ onMounted(load)
             <dd class="text-text">{{ profile.alpacaAccountStatus }}</dd>
           </div>
         </dl>
-        <router-link
-          :to="{ name: 'transactions', query: { uid: profile.uid } }"
-          class="mt-4 inline-flex w-fit items-center gap-1.5 text-xs text-primary underline hover:opacity-80"
-        >
-          <Receipt class="h-3.5 w-3.5" />
-          View all transactions for this user
-        </router-link>
+        <div class="mt-4 flex flex-wrap items-center gap-4">
+          <router-link
+            :to="{ name: 'transactions', query: { uid: profile.uid } }"
+            class="inline-flex w-fit items-center gap-1.5 text-xs text-primary underline hover:opacity-80"
+          >
+            <Receipt class="h-3.5 w-3.5" />
+            View all transactions for this user
+          </router-link>
+
+          <span v-if="adminAccess.loading" class="text-xs text-hint">Checking admin access...</span>
+          <span v-else-if="adminAccess.error" class="text-xs text-danger">{{ adminAccess.error }}</span>
+          <template v-else-if="adminAccess.data">
+            <StatusBadge
+              :label="adminAccess.data.source === 'env' ? 'Admin (static)' : 'Admin (granted)'"
+              variant="info"
+            />
+            <button
+              v-if="adminAccess.data.source === 'firestore' && profile.uid !== auth.user?.uid"
+              type="button"
+              :disabled="adminActionLoading"
+              class="inline-flex items-center gap-1.5 rounded-full border border-danger/30 px-3 py-1.5 text-xs font-medium text-danger transition hover:bg-danger-light disabled:opacity-50"
+              @click="revokeAccess"
+            >
+              <ShieldOff class="h-3.5 w-3.5" />
+              {{ adminActionLoading ? 'Revoking...' : 'Revoke admin access' }}
+            </button>
+          </template>
+          <button
+            v-else
+            type="button"
+            :disabled="adminActionLoading"
+            class="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-text transition hover:bg-black/5 disabled:opacity-50 dark:hover:bg-white/10"
+            @click="grantAccess"
+          >
+            <ShieldCheck class="h-3.5 w-3.5" />
+            {{ adminActionLoading ? 'Granting...' : 'Grant admin access' }}
+          </button>
+          <span v-if="adminActionError" class="text-xs text-danger">{{ adminActionError }}</span>
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
