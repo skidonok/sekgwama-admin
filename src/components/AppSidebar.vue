@@ -1,5 +1,19 @@
 <script setup>
-import { Activity, LayoutDashboard, LogOut, MessageCircle, Receipt, ScrollText, ShieldAlert, Users } from 'lucide-vue-next'
+import {
+  Activity,
+  BookOpen,
+  Flag,
+  LayoutDashboard,
+  LineChart,
+  LogOut,
+  Mail,
+  MessageCircle,
+  Receipt,
+  ScrollText,
+  ShieldAlert,
+  Users,
+  Webhook,
+} from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
 import icon from '../assets/icon.png'
@@ -12,9 +26,14 @@ const links = [
   { to: { name: 'dashboard' }, icon: LayoutDashboard, label: 'Dashboard' },
   { to: { name: 'status' }, icon: Activity, label: 'Status' },
   { to: { name: 'transactions' }, icon: Receipt, label: 'Transactions' },
+  { to: { name: 'orders' }, icon: LineChart, label: 'Orders' },
   { to: { name: 'users' }, icon: Users, label: 'Users' },
   { to: { name: 'fraud-reports' }, icon: ShieldAlert, label: 'Fraud Reports' },
+  { to: { name: 'fraud-flags' }, icon: Flag, label: 'Fraud Flags' },
   { to: { name: 'support-chat' }, icon: MessageCircle, label: 'Support Chat' },
+  { to: { name: 'broadcasts' }, icon: Mail, label: 'Broadcasts' },
+  { to: { name: 'academy' }, icon: BookOpen, label: 'Academy' },
+  { to: { name: 'webhooks' }, icon: Webhook, label: 'Webhooks' },
   { to: { name: 'audit-log' }, icon: ScrollText, label: 'Audit Log' },
 ]
 

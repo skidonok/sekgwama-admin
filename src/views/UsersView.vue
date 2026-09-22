@@ -135,7 +135,8 @@ onMounted(load)
         <div
           v-for="user in users"
           :key="user.uid"
-          class="grid min-w-[760px] grid-cols-[1.6fr_1.3fr_1fr_1fr_0.6fr] items-center gap-4 border-b border-border px-6 py-3 text-sm last:border-b-0"
+          class="grid min-w-[760px] cursor-pointer grid-cols-[1.6fr_1.3fr_1fr_1fr_0.6fr] items-center gap-4 border-b border-border px-6 py-3 text-sm last:border-b-0 hover:bg-black/[0.02] dark:hover:bg-white/[0.03]"
+          @click="$router.push({ name: 'user-detail', params: { uid: user.uid } })"
         >
           <span class="truncate text-text">{{ displayName(user) }}</span>
           <span class="truncate text-text-secondary">{{ user.email }}</span>
@@ -147,6 +148,7 @@ onMounted(load)
             :to="{ name: 'transactions', query: { uid: user.uid } }"
             title="View transactions"
             class="inline-flex w-fit items-center gap-1.5 text-xs text-primary underline hover:opacity-80"
+            @click.stop
           >
             <Receipt class="h-3.5 w-3.5" />
             Transactions

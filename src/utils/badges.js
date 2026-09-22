@@ -132,3 +132,22 @@ const HEALTH_CHECK_LABELS = {
 }
 
 export const healthCheckLabel = (name) => HEALTH_CHECK_LABELS[name] || name
+
+// Alpaca's own order status vocabulary - only the common ones get their own
+// variant, everything else (replaced, pending_*, calculated, etc.) falls
+// back to neutral rather than trying to enumerate Alpaca's full lifecycle.
+const ORDER_STATUS_VARIANTS = {
+  filled: 'success',
+  partially_filled: 'info',
+  new: 'info',
+  accepted: 'info',
+  pending_new: 'neutral',
+  canceled: 'neutral',
+  expired: 'warning',
+  rejected: 'danger',
+  suspended: 'danger',
+}
+
+export const orderStatusVariant = (status) => ORDER_STATUS_VARIANTS[status] || 'neutral'
+export const orderStatusLabel = (status) =>
+  status ? status.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase()) : 'Unknown'

@@ -5,7 +5,7 @@ import { onMounted, ref } from 'vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import UserIdentity from '../components/UserIdentity.vue'
 import { getErrorMessage } from '../services/api'
-import { getTransaction } from '../services/transactions'
+import { getTransaction, resolveFraudFlag } from '../services/transactions'
 import { paymentMethodLabel, paymentPurposeLabel, paymentStatusLabel, paymentStatusVariant } from '../utils/badges'
 import { formatAmount, formatDateTime } from '../utils/format'
 
@@ -17,6 +17,8 @@ const props = defineProps({
 const transaction = ref(null)
 const loading = ref(true)
 const error = ref('')
+const resolving = ref(false)
+const resolveError = ref('')
 
 const load = async () => {
   loading.value = true
@@ -27,6 +29,19 @@ const load = async () => {
     error.value = getErrorMessage(err)
   } finally {
     loading.value = false
+  }
+}
+
+const resolve = async (reviewStatus) => {
+  if (resolving.value) return
+  resolving.value = true
+  resolveError.value = ''
+  try {
+    transaction.value = await resolveFraudFlag(props.uid, props.paymentId, reviewStatus)
+  } catch (err) {
+    resolveError.value = getErrorMessage(err)
+  } finally {
+    resolving.value = false
   }
 }
 
@@ -93,7 +108,32 @@ onMounted(load)
             {{ transaction.failureReason }}
           </div>
           <div v-if="transaction.fraudFlag" class="mt-4 rounded-xl bg-warning-light px-4 py-3 text-sm text-warning dark:bg-warning/15">
-            Flagged for fraud review: {{ transaction.fraudFlag.reason || JSON.stringify(transaction.fraudFlag) }}
+            <p>
+              {{ transaction.fraudFlag.reviewStatus === 'pending_review' ? 'Flagged for fraud review' : 'Fraud flag' }}:
+              {{ transaction.fraudFlag.reason || JSON.stringify(transaction.fraudFlag) }}
+            </p>
+            <p v-if="transaction.fraudFlag.reviewStatus !== 'pending_review'" class="mt-1 text-xs opacity-80">
+              Resolved as: {{ transaction.fraudFlag.reviewStatus === 'confirmed_fraud' ? 'Confirmed fraud' : 'Cleared' }}
+            </p>
+            <div v-if="transaction.fraudFlag.reviewStatus === 'pending_review'" class="mt-3 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                :disabled="resolving"
+                class="rounded-full bg-success px-4 py-1.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                @click="resolve('cleared')"
+              >
+                Clear flag
+              </button>
+              <button
+                type="button"
+                :disabled="resolving"
+                class="rounded-full bg-danger px-4 py-1.5 text-xs font-medium text-white transition hover:opacity-90 disabled:opacity-50"
+                @click="resolve('confirmed_fraud')"
+              >
+                Confirm fraud
+              </button>
+              <span v-if="resolveError" class="text-xs text-danger">{{ resolveError }}</span>
+            </div>
           </div>
         </div>
 
