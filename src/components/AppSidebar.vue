@@ -34,7 +34,7 @@ const handleLogout = async () => {
       <router-link
         v-for="link in links"
         :key="link.label"
-        v-slot="{ isActive, href, navigate }"
+        v-slot="{ isExactActive, href, navigate }"
         :to="link.to"
         custom
       >
@@ -42,7 +42,7 @@ const handleLogout = async () => {
           :href="href"
           :title="link.label"
           class="group relative flex h-11 w-11 items-center justify-center rounded-xl transition"
-          :class="isActive ? 'bg-primary text-white' : 'text-text-secondary hover:bg-black/5 dark:hover:bg-white/10'"
+          :class="isExactActive ? 'bg-primary text-white' : 'text-text-secondary hover:bg-black/5 dark:hover:bg-white/10'"
           @click="navigate"
         >
           <component :is="link.icon" class="h-[19px] w-[19px]" stroke-width="2" />
