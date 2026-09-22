@@ -27,3 +27,64 @@ const OUTCOME_VARIANTS = {
 }
 
 export const outcomeVariant = (outcome) => OUTCOME_VARIANTS[outcome] || 'neutral'
+
+export const PAYMENT_STATUSES = ['pending', 'S', 'F', 'E']
+
+const PAYMENT_STATUS_VARIANTS = {
+  pending: 'warning',
+  S: 'success',
+  F: 'danger',
+  E: 'danger',
+}
+
+const PAYMENT_STATUS_LABELS = {
+  pending: 'Pending',
+  S: 'Successful',
+  F: 'Failed',
+  E: 'Error',
+}
+
+export const paymentStatusVariant = (status) => PAYMENT_STATUS_VARIANTS[status] || 'neutral'
+export const paymentStatusLabel = (status) => PAYMENT_STATUS_LABELS[status] || status
+
+export const PAYMENT_PURPOSES = ['deposit', 'buy_order']
+
+const PAYMENT_PURPOSE_LABELS = {
+  deposit: 'Deposit',
+  buy_order: 'Buy order',
+}
+
+export const paymentPurposeLabel = (purpose) => PAYMENT_PURPOSE_LABELS[purpose] || purpose
+
+const PAYMENT_METHOD_LABELS = {
+  VISA: 'Visa',
+  MASTERCARD: 'Mastercard',
+  BANK_EFT: 'Bank EFT',
+}
+
+export const paymentMethodLabel = (method) => PAYMENT_METHOD_LABELS[method] || method
+
+const ONBOARDING_STATUS_VARIANTS = {
+  not_started: 'neutral',
+  in_progress: 'info',
+  submitted: 'info',
+  approval_pending: 'warning',
+  approved: 'success',
+  active: 'success',
+  rejected: 'danger',
+  action_required: 'warning',
+}
+
+const ONBOARDING_STATUS_LABELS = {
+  not_started: 'Not started',
+  in_progress: 'In progress',
+  submitted: 'Submitted',
+  approval_pending: 'Approval pending',
+  approved: 'Approved',
+  active: 'Active',
+  rejected: 'Rejected',
+  action_required: 'Action required',
+}
+
+export const onboardingStatusVariant = (status) => ONBOARDING_STATUS_VARIANTS[status] || 'neutral'
+export const onboardingStatusLabel = (status) => ONBOARDING_STATUS_LABELS[status] || status || 'Unknown'

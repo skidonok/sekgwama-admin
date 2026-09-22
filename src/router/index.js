@@ -51,6 +51,25 @@ const routes = [
         component: () => import('../views/AuditLogView.vue'),
         meta: { title: 'Audit Log' },
       },
+      {
+        path: 'transactions',
+        name: 'transactions',
+        component: () => import('../views/TransactionsView.vue'),
+        meta: { title: 'Transactions' },
+      },
+      {
+        path: 'transactions/:uid/:paymentId',
+        name: 'transaction-detail',
+        component: () => import('../views/TransactionDetailView.vue'),
+        props: true,
+        meta: { title: 'Transaction' },
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: () => import('../views/UsersView.vue'),
+        meta: { title: 'Users' },
+      },
     ],
   },
 ]

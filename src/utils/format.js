@@ -33,3 +33,9 @@ export const truncateId = (id, length = 8) => {
   if (!id) return ''
   return id.length > length ? `${id.slice(0, length)}...` : id
 }
+
+export const formatAmount = (amount, currency) => {
+  const n = Number(amount)
+  const value = Number.isFinite(n) ? n.toFixed(2) : amount
+  return currency ? `${currency} ${value}` : value
+}

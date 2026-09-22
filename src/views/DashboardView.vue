@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
 } from 'chart.js'
-import { FileWarning, MessageCircle, ShieldAlert } from 'lucide-vue-next'
+import { Clock, FileWarning, MessageCircle, ShieldAlert } from 'lucide-vue-next'
 import { onMounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
 
@@ -17,6 +17,7 @@ import { getErrorMessage } from '../services/api'
 import { exportAuditLog } from '../services/audit'
 import { listFraudReports } from '../services/fraudReports'
 import { listSupportThreads } from '../services/supportChat'
+import { listTransactions } from '../services/transactions'
 import { formatDayLabel } from '../utils/format'
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
@@ -27,6 +28,7 @@ const error = ref('')
 const needingAttention = ref(0)
 const totalReports = ref(0)
 const activeThreads = ref(0)
+const pendingTransactionsLabel = ref(0)
 
 const chartData = ref({ labels: [], datasets: [] })
 const chartOptions = {
@@ -49,16 +51,22 @@ const load = async () => {
     const to = new Date()
     const from = new Date(to.getTime() - 14 * 24 * 60 * 60 * 1000)
 
-    const [submitted, all, threads, audit] = await Promise.all([
+    const [submitted, all, threads, audit, pendingTransactions] = await Promise.all([
       listFraudReports('submitted'),
       listFraudReports(),
       listSupportThreads(),
       exportAuditLog({ from: from.toISOString(), to: to.toISOString() }),
+      // Capped at 100 - this is a landing-page signal ("is anything stuck?"),
+      // not an exact count, same spirit as payments.service.listDeposits'
+      // "generous rather than exact" comment. See TransactionsView for the
+      // full, paginated list.
+      listTransactions({ status: 'pending', limit: 100 }),
     ])
 
     needingAttention.value = submitted.length
     totalReports.value = all.length
     activeThreads.value = threads.length
+    pendingTransactionsLabel.value = pendingTransactions.length === 100 ? '100+' : pendingTransactions.length
 
     // Bucket audit entries into one count per day across the 14-day window.
     const days = []
@@ -101,7 +109,7 @@ onMounted(load)
       {{ error }}
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <KpiCard
         label="Fraud reports needing attention"
         :value="needingAttention"
@@ -123,6 +131,15 @@ onMounted(load)
         accent="primary"
         :loading="loading"
       />
+      <router-link :to="{ name: 'transactions', query: { status: 'pending' } }">
+        <KpiCard
+          label="Pending transactions"
+          :value="pendingTransactionsLabel"
+          :icon="Clock"
+          accent="warning"
+          :loading="loading"
+        />
+      </router-link>
     </div>
 
     <div class="rounded-2xl bg-surface p-6 shadow-[0_1px_2px_rgba(16,24,40,0.04),0_1px_3px_rgba(16,24,40,0.06)] dark:border dark:border-border">
