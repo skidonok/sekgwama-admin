@@ -77,7 +77,7 @@ const backToCredentials = () => {
 
     <div class="relative w-full max-w-sm">
       <div class="mb-8 flex flex-col items-center gap-3">
-        <img :src="logo" alt="Sekgwama" class="h-10 w-10 object-contain" />
+        <img :src="logo" alt="Sekgwama" class="h-20 w-20 object-contain" />
         <h1 class="text-xl font-semibold text-white">Sekgwama Admin</h1>
         <p class="text-sm text-white/50">Sign in to the internal ops console</p>
       </div>
