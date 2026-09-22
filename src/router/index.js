@@ -20,6 +20,12 @@ const routes = [
         meta: { title: 'Dashboard' },
       },
       {
+        path: 'status',
+        name: 'status',
+        component: () => import('../views/StatusView.vue'),
+        meta: { title: 'Status' },
+      },
+      {
         path: 'fraud-reports',
         name: 'fraud-reports',
         component: () => import('../views/FraudReportsView.vue'),

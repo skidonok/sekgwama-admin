@@ -1,5 +1,5 @@
 <script setup>
-import { LayoutDashboard, LogOut, MessageCircle, Receipt, ScrollText, ShieldAlert, Users } from 'lucide-vue-next'
+import { Activity, LayoutDashboard, LogOut, MessageCircle, Receipt, ScrollText, ShieldAlert, Users } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 
 import icon from '../assets/icon.png'
@@ -10,6 +10,7 @@ const auth = useAuthStore()
 
 const links = [
   { to: { name: 'dashboard' }, icon: LayoutDashboard, label: 'Dashboard' },
+  { to: { name: 'status' }, icon: Activity, label: 'Status' },
   { to: { name: 'transactions' }, icon: Receipt, label: 'Transactions' },
   { to: { name: 'users' }, icon: Users, label: 'Users' },
   { to: { name: 'fraud-reports' }, icon: ShieldAlert, label: 'Fraud Reports' },

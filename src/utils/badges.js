@@ -88,3 +88,47 @@ const ONBOARDING_STATUS_LABELS = {
 
 export const onboardingStatusVariant = (status) => ONBOARDING_STATUS_VARIANTS[status] || 'neutral'
 export const onboardingStatusLabel = (status) => ONBOARDING_STATUS_LABELS[status] || status || 'Unknown'
+
+const HEALTH_STATUS_VARIANTS = {
+  operational: 'success',
+  degraded: 'warning',
+  not_configured: 'neutral',
+  down: 'danger',
+}
+
+const HEALTH_STATUS_LABELS = {
+  operational: 'Operational',
+  degraded: 'Degraded',
+  not_configured: 'Not configured',
+  down: 'Down',
+}
+
+export const healthStatusVariant = (status) => HEALTH_STATUS_VARIANTS[status] || 'neutral'
+export const healthStatusLabel = (status) => HEALTH_STATUS_LABELS[status] || status
+
+const SYSTEM_ERROR_AREA_LABELS = {
+  alpaca: 'Alpaca',
+  realpay: 'RealPay',
+  polygon: 'Polygon',
+  bse: 'BSE',
+  email: 'Email',
+  push: 'Push',
+  firestore: 'Firestore',
+  other: 'Other',
+}
+
+export const systemErrorAreaLabel = (area) => SYSTEM_ERROR_AREA_LABELS[area] || area
+
+const HEALTH_CHECK_LABELS = {
+  firestore: 'Firestore',
+  alpaca: 'Alpaca',
+  realpay: 'RealPay',
+  polygon: 'Polygon',
+  bse: 'BSE',
+  email: 'Email',
+  'trade-events-worker': 'Trade events worker',
+  'reconcile-payments-job': 'Payment reconciliation job',
+  'academy-reminders-job': 'Academy reminders job',
+}
+
+export const healthCheckLabel = (name) => HEALTH_CHECK_LABELS[name] || name
